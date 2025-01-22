@@ -1,0 +1,9 @@
+br\com\compass\domain\Conta.class
+br\com\compass\domain\Usuario.class
+br\com\compass\dao\UsuarioDAO.class
+br\com\compass\domain\Transacao.class
+br\com\compass\dao\TipoTransacao.class
+br\com\compass\HibernateUtil.class
+br\com\compass\dao\ContaDAO.class
+br\com\compass\App.class
+br\com\compass\dao\TipoConta.class
