@@ -18,7 +18,7 @@ public class Conta {
     @Column(nullable = false, unique = true)
     private String numero;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal saldo;
 
     @Enumerated(EnumType.STRING)
@@ -28,6 +28,10 @@ public class Conta {
     @Column(nullable = false)
     private LocalDateTime dataCriacao;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
+
     @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Transacao> transacoes = new ArrayList<>();
 
@@ -36,36 +40,15 @@ public class Conta {
         this.dataCriacao = LocalDateTime.now();
     }
 
-    public Conta(String numero, TipoConta tipo) {
+    public Conta(String numero, TipoConta tipo, Usuario usuario) {
         this();
         this.numero = numero;
         this.tipo = tipo;
-    }
-
-    public void adicionarTransacao(Transacao transacao) {
-        this.transacoes.add(transacao);
-        transacao.setConta(this);
-    }
-
-    public void removerTransacao(Transacao transacao) {
-        this.transacoes.remove(transacao);
-        transacao.setConta(null);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+        this.usuario = usuario;
     }
 
     public String getNumero() {
         return numero;
-    }
-
-    public void setNumero(String numero) {
-        this.numero = numero;
     }
 
     public BigDecimal getSaldo() {
@@ -74,13 +57,5 @@ public class Conta {
 
     public void setSaldo(BigDecimal saldo) {
         this.saldo = saldo;
-    }
-
-    public TipoConta getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(TipoConta tipo) {
-        this.tipo = tipo;
     }
 }
