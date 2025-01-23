@@ -5,8 +5,6 @@ import br.com.compass.domain.Usuario;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.util.List;
-
 public class UsuarioDAO {
 
     public void salvar(Usuario usuario) {
@@ -21,9 +19,12 @@ public class UsuarioDAO {
         }
     }
 
-    public List<Usuario> listar() {
+    public Usuario buscarPorCpf(String cpf) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery("from Usuario", Usuario.class).list();
+            return session
+                    .createQuery("from Usuario where cpf = :cpf", Usuario.class)
+                    .setParameter("cpf", cpf)
+                    .getSingleResult();
         }
     }
 }

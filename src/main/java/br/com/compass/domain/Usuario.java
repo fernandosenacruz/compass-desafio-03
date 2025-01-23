@@ -2,6 +2,8 @@ package br.com.compass.domain;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "usuarios")
 public class Usuario {
@@ -22,47 +24,22 @@ public class Usuario {
     @Column(nullable = false)
     private String numTelefone;
 
+    public Usuario() {}
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+    public Usuario(String nome, String cpf, String dtNascimento, String numTelefone) {
+        this.nome = nome;
+        this.cpf = cpf;
+        this.dtNascimento = dtNascimento;
+        this.numTelefone = numTelefone;
     }
 
     public String getNome() {
         return nome;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
     public String getCpf() {
         return cpf;
     }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
-
-    public String getDtNascimento() {
-        return dtNascimento;
-    }
-
-    public void setDtNascimento(String dtNascimento) {
-        this.dtNascimento = dtNascimento;
-    }
-
-    public String getNumTelefone() {
-        return numTelefone;
-    }
-
-    public void setNumTelefone(String numTelefone) {
-        this.numTelefone = numTelefone;
-    }
-
 
     @Override
     public String toString() {
@@ -73,5 +50,17 @@ public class Usuario {
                 ", número de telefone='" + numTelefone + '\'' +
                 ", cpf='" + cpf + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Usuario usuario = (Usuario) o;
+        return Objects.equals(getCpf(), usuario.getCpf());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getCpf());
     }
 }
