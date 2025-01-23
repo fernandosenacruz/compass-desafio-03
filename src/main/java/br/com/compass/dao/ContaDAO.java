@@ -37,10 +37,11 @@ public class ContaDAO {
             transaction = session.beginTransaction();
             conta.setSaldo(conta.getSaldo().add(valor));
 
-            Transacao transacao = new Transacao(TipoTransacao.DEPOSITO, valor);
-            conta.adicionarTransacao(transacao);
+            Transacao transacao = new Transacao(TipoTransacao.DEPOSITO, valor, conta);
+            TransacaoDAO transacaoDAO = new TransacaoDAO();
+            transacaoDAO.salvar(transacao);
 
-            session.update(conta);
+            session.merge(conta);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
@@ -59,10 +60,11 @@ public class ContaDAO {
             transaction = session.beginTransaction();
             conta.setSaldo(conta.getSaldo().subtract(valor));
 
-            Transacao transacao = new Transacao(TipoTransacao.SAQUE, valor);
-            conta.adicionarTransacao(transacao);
+            Transacao transacao = new Transacao(TipoTransacao.SAQUE, valor, conta);
+            TransacaoDAO transacaoDAO = new TransacaoDAO();
+            transacaoDAO.salvar(transacao);
 
-            session.update(conta);
+            session.merge(conta);
             transaction.commit();
             return true;
         } catch (Exception e) {
@@ -85,14 +87,16 @@ public class ContaDAO {
             origem.setSaldo(origem.getSaldo().subtract(valor));
             destino.setSaldo(destino.getSaldo().add(valor));
 
-            Transacao transacaoOrigem = new Transacao(TipoTransacao.TRANSFERENCIA_SAIDA, valor);
-            Transacao transacaoDestino = new Transacao(TipoTransacao.TRANSACAO_ENTRADA, valor);
+            Transacao transacaoOrigem = new Transacao(TipoTransacao.TRANSFERENCIA_SAIDA, valor, origem);
+            Transacao transacaoDestino = new Transacao(TipoTransacao.TRANSACAO_ENTRADA, valor, destino);
 
-            origem.adicionarTransacao(transacaoOrigem);
-            destino.adicionarTransacao(transacaoDestino);
+            TransacaoDAO transacaoDAO = new TransacaoDAO();
 
-            session.update(origem);
-            session.update(destino);
+            transacaoDAO.salvar(transacaoOrigem);
+            transacaoDAO.salvar(transacaoDestino);
+
+            session.merge(origem);
+            session.merge(destino);
 
             transaction.commit();
             return true;
