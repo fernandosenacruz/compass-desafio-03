@@ -1,10 +1,9 @@
 package br.com.compass;
 
-import br.com.compass.dao.ContaDAO;
-import br.com.compass.dao.TipoConta;
-import br.com.compass.dao.UsuarioDAO;
-import br.com.compass.domain.Conta;
-import br.com.compass.domain.Usuario;
+import br.com.compass.dao.AccountDAO;
+import br.com.compass.dao.AccountType;
+import br.com.compass.domain.Account;
+import br.com.compass.domain.Client;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.math.BigDecimal;
@@ -28,206 +27,272 @@ public class App {
         Scanner scanner = new Scanner(System.in);
         mainMenu(scanner);
         scanner.close();
-        System.out.println("Aplicação fechada!");
+        System.out.println("Application closed");
     }
 
-    public static void salvarUsuarioPadrao(UsuarioDAO usuarioDAO) {
-        Usuario usuario = new Usuario("Ximira", "20635134063", "01-02-1980", "81996446010");
-        usuarioDAO.salvar(usuario);
-    }
-
-    public static Usuario selecionarUsuarioPadrao() {
-        UsuarioDAO usuarioDAO = new UsuarioDAO();
-        Usuario dbUsuario = usuarioDAO.buscarPorCpf("20635134063");
-        if (dbUsuario == null) {
-            salvarUsuarioPadrao(usuarioDAO);
-        }
-        return dbUsuario;
-    }
-
-    public static void mainMenu(Scanner scanner) {
-        Usuario usuario = selecionarUsuarioPadrao();
-        ContaDAO contaDAO = new ContaDAO();
-        boolean running = true;
+    public static void loginMenu(Scanner scanner, boolean running) {
+        AccountDAO accountDAO = new AccountDAO();
 
         while (running) {
-            System.out.println("\nUsuário: " + usuario.getNome() + "!\n");
-            System.out.println("========= Menu Principal =========");
-            System.out.println("|| 1. Login                     ||");
-            System.out.println("|| 2. Abrir Conta               ||");
-            System.out.println("|| 0. Sair                      ||");
+            System.out.println("========== Login Menu ============");
+            System.out.println("|| 1. Already client            ||");
+            System.out.println("|| 2. Account Opening           ||");
+            System.out.println("|| 0. Exit                      ||");
             System.out.println("==================================");
-            System.out.print("Opção: ");
+            System.out.print("Choose an option: ");
 
             int option = scanner.nextInt();
 
             switch (option) {
                 case 1:
-                    System.out.print("Informe o número da sua conta: ");
-                    String numero = scanner.next();
-                    Conta conta = contaDAO.buscarPorNumero(numero);
+                    System.out.print("Inform an account number: ");
+                    String accountNumber = scanner.next();
+                    Account account = accountDAO.findByNumber(accountNumber);
 
-                    if (conta == null) {
-                        System.out.println("Conta não localizada!");
+                    if (account == null) {
+                        System.out.println("Account not found!");
                     } else {
-                        bankMenu(scanner, conta);
+                        bankMenu(scanner, account);
+                        running = false;
                     }
                     break;
                 case 2:
-                    abrirConta(scanner, contaDAO, usuario);
+                    openAccount(scanner, accountDAO);
+                    running = false;
                     break;
                 case 0:
                     running = false;
                     break;
                 default:
-                    System.out.println("Opção inválida! Por favor tente novamente.");
+                    System.out.println("Invalid option! Please try again!");
             }
         }
     }
 
-    public static void abrirConta(Scanner scanner, ContaDAO contaDAO, Usuario usuario) {
-        String numero = gerarNumeroConta();
-
-        System.out.println("Select account type:");
-        System.out.println("1. Corrente");
-        System.out.println("2. Poupança");
-        System.out.println("3. Salário");
-        System.out.println("4. Pagamentos");
-        System.out.println("5. Empresarial");
-
-        int tipoOption = scanner.nextInt();
-        TipoConta tipoConta;
-
-        switch (tipoOption) {
-            case 1:
-                tipoConta = TipoConta.CORRENTE;
-                break;
-            case 2:
-                tipoConta = TipoConta.POUPANCA;
-                break;
-            case 3:
-                tipoConta = TipoConta.SALARIO;
-                break;
-            case 4:
-                tipoConta = TipoConta.PAGAMENTOS;
-                break;
-            case 5:
-                tipoConta = TipoConta.EMPRESARIAL;
-                break;
-            default:
-                System.out.println("Tipo de conta inválido!");
-                return;
-        }
-
-        Conta conta = new Conta(numero, tipoConta, usuario);
-        contaDAO.salvar(conta);
-        System.out.println("Conta criada com sucesso!");
-        System.out.println("Número da conta: " + conta.getNumero());
-    }
-
-    public static void bankMenu(Scanner scanner, Conta conta) {
-        ContaDAO contaDAO = new ContaDAO();
+    public static void mainMenu(Scanner scanner) {
+        AccountDAO accountDAO = new AccountDAO();
         boolean running = true;
 
         while (running) {
-            System.out.println("======== Menu da Conta =======");
-            System.out.println("|| 1. Depósito              ||");
-            System.out.println("|| 2. Saque                 ||");
-            System.out.println("|| 3. Saldo                 ||");
-            System.out.println("|| 4. Transferência         ||");
-            System.out.println("|| 5. Extrato Bancário      ||");
-            System.out.println("|| 0. Sair                  ||");
-            System.out.println("=============================");
-            System.out.print("Escolha uma option: ");
+            System.out.println("=========== Main Menu ============");
+            System.out.println("|| 1. Login                     ||");
+            System.out.println("|| 2. Account Opening           ||");
+            System.out.println("|| 0. Exit                      ||");
+            System.out.println("==================================");
+            System.out.print("Choose an option: ");
 
             int option = scanner.nextInt();
 
             switch (option) {
                 case 1:
-                    depositar(scanner, conta, contaDAO);
+                    loginMenu(scanner, running);
                     break;
                 case 2:
-                    sacar(scanner, conta, contaDAO);
-                    break;
-                case 3:
-                    System.out.println("Saldo atual: " + conta.getSaldo());
-                    break;
-                case 4:
-                    transferir(scanner, conta, contaDAO);
-                    break;
-                case 5:
-                    mostrarExtrato(contaDAO, conta);
+                    openAccount(scanner, accountDAO);
                     break;
                 case 0:
                     running = false;
                     break;
                 default:
-                    System.out.println("Opção inválida! Por favor tente novamente.");
+                    System.out.println("Invalid option! Please try again!");
             }
         }
     }
 
-    public static void depositar(Scanner scanner, Conta conta, ContaDAO contaDAO) {
-        System.out.print("Informe o valor a ser depositado: ");
-        BigDecimal valor = scanner.nextBigDecimal();
+    public static Client clientMenu(Scanner scanner) {
+        System.out.println("========= Client Register ==========");
+        System.out.println("Name: ");
+        String name = scanner.next();
+        System.out.println("CPF number: ");
+        String cpfNumber = scanner.next();
+        System.out.println("Birth date (year-month-day): ");
+        String birthDate = scanner.next();
+        System.out.println("Phone number (code+number): ");
+        String phoneNumber = scanner.next();
 
-        if (valor.compareTo(BigDecimal.ZERO) < 0) {
-            System.out.println("Não é possível depositar valores negativos!");
+        Client newClient = new Client(name, cpfNumber, birthDate, phoneNumber);
+        if (validateClient(newClient) == null) {
+            clientMenu(scanner);
+        }
+        return newClient;
+    }
+
+    public static void openAccount(Scanner scanner, AccountDAO accountDAO) {
+        String accountNumber = accountNumberGenerate();
+
+        System.out.println("Select account type:");
+        System.out.println("1. Checking Account");
+        System.out.println("2. Savings Account");
+        System.out.println("3. Payroll Account");
+        System.out.println("4. Payments Account");
+        System.out.println("5. Corporate Account");
+
+        int option = scanner.nextInt();
+        AccountType accountType;
+
+        switch (option) {
+            case 1:
+                accountType = AccountType.CHECKING;
+                break;
+            case 2:
+                accountType = AccountType.SAVING;
+                break;
+            case 3:
+                accountType = AccountType.PAYROLL;
+                break;
+            case 4:
+                accountType = AccountType.PAYMENT;
+                break;
+            case 5:
+                accountType = AccountType.CORPORATE;
+                break;
+            default:
+                System.out.println("Invalid type!");
+                return;
+        }
+
+        Client client = clientMenu(scanner);
+        Account account = new Account(accountNumber, accountType, client);
+        if (accountDAO.hasSameTypeAccount(client, accountType)) {
+            System.out.println("An account already exists with the same type to informed CPF!");
             return;
         }
-        if (valor.compareTo(BigDecimal.ZERO) > 0) {
-            contaDAO.depositar(conta, valor);
-            System.out.println("Depósito realizado com sucesso!");
+        accountDAO.save(account);
+        System.out.println("Account registered successfully!");
+        System.out.println("Account number: " + account.getNumber());
+    }
+
+    public static void bankMenu(Scanner scanner, Account account) {
+        AccountDAO accountDAO = new AccountDAO();
+        boolean running = true;
+
+        while (running) {
+            System.out.println("========= Bank Menu =========");
+            System.out.println("|| 1. Deposit              ||");
+            System.out.println("|| 2. Withdraw             ||");
+            System.out.println("|| 3. Check Balance        ||");
+            System.out.println("|| 4. Transfer             ||");
+            System.out.println("|| 5. Bank Statement       ||");
+            System.out.println("|| 0. Exit                 ||");
+            System.out.println("=============================");
+            System.out.print("Choose an option: ");
+
+            int option = scanner.nextInt();
+
+            switch (option) {
+                case 1:
+                    deposit(scanner, account, accountDAO);
+                    break;
+                case 2:
+                    withdraw(scanner, account, accountDAO);
+                    break;
+                case 3:
+                    System.out.println("Current balance: " + account.getBalance());
+                    break;
+                case 4:
+                    transfer(scanner, account, accountDAO);
+                    break;
+                case 5:
+                    bankStatement(accountDAO, account);
+                    break;
+                case 0:
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Invalid option! Please try again!");
+            }
         }
     }
 
-    public static void sacar(Scanner scanner, Conta conta, ContaDAO contaDAO) {
-        System.out.print("Informe o valor a ser sacado: ");
-        BigDecimal valor = scanner.nextBigDecimal();
-        if (!contaDAO.sacar(conta, valor)) return;
-        System.out.println("Saque realizado com sucesso!");
+    public static void deposit(Scanner scanner, Account account, AccountDAO accountDAO) {
+        System.out.print("Inform a value to deposit: ");
+        BigDecimal value = scanner.nextBigDecimal();
+
+        if (value.compareTo(BigDecimal.ZERO) < 0) {
+            System.out.println("Not possible to transfer negative values");
+            return;
+        }
+        if (value.compareTo(BigDecimal.ZERO) > 0) {
+            accountDAO.deposit(account, value);
+            System.out.println("Deposit successful!");
+        }
     }
 
-    public static void transferir(Scanner scanner, Conta origem, ContaDAO contaDAO) {
-        System.out.print("Informe o número da conta de destino: ");
-        String numeroDestino = scanner.next();
-        Conta destino = contaDAO.buscarPorNumero(numeroDestino);
+    public static void withdraw(Scanner scanner, Account account, AccountDAO accountDAO) {
+        System.out.print("Inform a value to withdraw: ");
+        BigDecimal value = scanner.nextBigDecimal();
+        if (!accountDAO.withdraw(account, value)) return;
+        System.out.println("Withdraw successful!");
+    }
 
-        if (destino == null) {
-            System.out.println("Conta não encontrada!");
+    public static void transfer(Scanner scanner, Account origin, AccountDAO accountDAO) {
+        System.out.print("Inform a account to transfer: ");
+        String numberAccount = scanner.next();
+        Account accountDestination = accountDAO.findByNumber(numberAccount);
+
+        if (accountDestination == null) {
+            System.out.println("Account not found!");
             return;
         }
 
-        System.out.print("Informe o valor a ser transferido: ");
-        BigDecimal valor = scanner.nextBigDecimal();
-        if (valor.compareTo(BigDecimal.ZERO) < 0) {
-            System.out.println("Não é possível depositar valores negativos!");
+        System.out.print("Inform a value to transfer: ");
+        BigDecimal value = scanner.nextBigDecimal();
+        if (value.compareTo(BigDecimal.ZERO) < 0) {
+            System.out.println("Not possible to transfer negative values!");
             return;
         }
 
-        if (!contaDAO.transferir(origem, destino, valor)) return;
-        System.out.println("Transferência realizada com sucesso!");
+        if (!accountDAO.transfer(origin, accountDestination, value)) return;
+        System.out.println("Transfer successful!");
     }
 
-    public static void mostrarExtrato(ContaDAO contaDAO, Conta conta) {
-        System.out.println("Extrato bancário:");
-        contaDAO.extrato(conta).forEach(transacao ->
-                System.out.println(formatarDataHora(transacao.getDataHora()) + " - " + transacao.getTipo() + ": " + transacao.getValor()));
+    public static void bankStatement(AccountDAO accountDAO, Account account) {
+        System.out.println("Bank Statement:");
+        accountDAO.bankStatement(account).forEach(accountTransaction ->
+                System.out.println(
+                        formatDateTime(accountTransaction.getDateTime())
+                        + " - " + accountTransaction.getType()
+                        + ": " + accountTransaction.getValue())
+        );
     }
     
-    public static String gerarNumeroConta() {
-        StringBuilder numeroConta = new StringBuilder();
+    public static String accountNumberGenerate() {
+        StringBuilder accountNumber = new StringBuilder();
         Random r = new Random();
         
         for (int i = 0; i < 6; i++) {
             int num = r.nextInt(10);
-            numeroConta.append(num);
+            accountNumber.append(num);
         }
         
-        return numeroConta.toString();
+        return accountNumber.toString();
     }
 
-    public static String formatarDataHora(LocalDateTime dataHora) {
+    public static String formatDateTime(LocalDateTime dataHora) {
         return dataHora.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm"));
+    }
+
+    public static Client validateClient(Client newClient) {
+        if (
+                newClient.getName().isEmpty()
+                || newClient.getCpf().isEmpty()
+                || newClient.getBirthDate().isEmpty()
+                || newClient.getPhoneNumber().isEmpty()
+        ) {
+            System.out.println("All fields must be filled!");
+            return null;
+        }
+        if (newClient.getCpf().trim().length() != 11) {
+            System.out.println("Invalid CPF!");
+            return null;
+        }
+
+        String[] data = newClient.getBirthDate().split("-");
+        if (data.length != 3) {
+            System.out.println("Invalid birth date!.");
+            return null;
+        }
+
+        return newClient;
     }
 }
