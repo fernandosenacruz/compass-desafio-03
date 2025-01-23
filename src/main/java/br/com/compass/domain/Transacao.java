@@ -32,10 +32,12 @@ public class Transacao {
         this.dataHora = LocalDateTime.now();
     }
 
-    public Transacao(TipoTransacao tipo, BigDecimal valor) {
+    public Transacao(TipoTransacao tipo, BigDecimal valor, Conta conta) {
         this();
         this.tipo = tipo;
         this.valor = valor;
+        this.conta = conta;
+        this.dataHora = LocalDateTime.now();;
     }
 
     public Long getId() {
