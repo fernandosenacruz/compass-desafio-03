@@ -7,18 +7,6 @@ import org.hibernate.Transaction;
 
 public class ClientDAO {
 
-    public void save(Client client) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-            session.save(client);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
-        }
-    }
-
     public Client findByCPF(String cpf) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session
@@ -27,4 +15,24 @@ public class ClientDAO {
                     .getSingleResult();
         }
     }
+
+    public Client saveOrUpdate(Client client) {
+        Client persistedClient = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
+            Client dbClient = findByCPF(client.getCpf());
+            if (dbClient != null) {
+                dbClient.setName(client.getName());
+                dbClient.setBirthDate(client.getBirthDate());
+                dbClient.setPhoneNumber(client.getPhoneNumber());
+                persistedClient = session.merge(dbClient);
+            } else {
+                session.save(client);
+                persistedClient = client;
+            }
+            transaction.commit();
+        }
+        return persistedClient;
+    }
+
 }

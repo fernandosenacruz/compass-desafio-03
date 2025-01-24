@@ -108,9 +108,9 @@ public class AccountDAO {
             destination.setBalance(destination.getBalance().add(value));
 
             AccountTransaction accountTransactionOrigin =
-                    new AccountTransaction(TransactionType.INCOME_TRANSFER, value, origin);
+                    new AccountTransaction(TransactionType.EXPENSE_TRANSFER, value, origin);
             AccountTransaction accountTransactionDestination =
-                    new AccountTransaction(TransactionType.EXPENSE_TRANSFER, value, destination);
+                    new AccountTransaction(TransactionType.INCOME_TRANSFER, value, destination);
 
             AccountTransactionDAO accountTransactionDAO = new AccountTransactionDAO();
 

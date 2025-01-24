@@ -2,6 +2,7 @@ package br.com.compass;
 
 import br.com.compass.dao.AccountDAO;
 import br.com.compass.dao.AccountType;
+import br.com.compass.dao.ClientDAO;
 import br.com.compass.domain.Account;
 import br.com.compass.domain.Client;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -152,6 +153,8 @@ public class App {
         }
 
         Client client = clientMenu(scanner);
+        ClientDAO clientDAO = new ClientDAO();
+        client = clientDAO.saveOrUpdate(client);
         Account account = new Account(accountNumber, accountType, client);
         if (accountDAO.hasSameTypeAccount(client, accountType)) {
             System.out.println("An account already exists with the same type to informed CPF!");
