@@ -1,4 +1,4 @@
-package br.com.compass;
+package br.com.compass.util;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;

@@ -1,6 +1,6 @@
 package br.com.compass.dao;
 
-import br.com.compass.HibernateUtil;
+import br.com.compass.util.HibernateUtil;
 import br.com.compass.domain.Account;
 import br.com.compass.domain.Client;
 import br.com.compass.domain.AccountTransaction;
