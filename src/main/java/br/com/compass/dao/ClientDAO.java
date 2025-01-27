@@ -12,7 +12,7 @@ public class ClientDAO {
             return session
                     .createQuery("from Client where cpf = :cpf", Client.class)
                     .setParameter("cpf", cpf)
-                    .getSingleResult();
+                    .getSingleResultOrNull();
         }
     }
 

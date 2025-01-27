@@ -27,43 +27,49 @@ public class AccountService {
         System.out.println("4. Payments Account");
         System.out.println("5. Corporate Account");
 
-        int option = scanner.nextInt();
-        AccountType accountType;
+        if (scanner.hasNextInt()) {
+            int option = scanner.nextInt();
+            AccountType accountType;
 
-        switch (option) {
-            case 1:
-                accountType = AccountType.CHECKING;
-                break;
-            case 2:
-                accountType = AccountType.SAVING;
-                break;
-            case 3:
-                accountType = AccountType.PAYROLL;
-                break;
-            case 4:
-                accountType = AccountType.PAYMENT;
-                break;
-            case 5:
-                accountType = AccountType.CORPORATE;
-                break;
-            default:
-                System.out.println("Invalid type!");
+            switch (option) {
+                case 1:
+                    accountType = AccountType.CHECKING;
+                    break;
+                case 2:
+                    accountType = AccountType.SAVING;
+                    break;
+                case 3:
+                    accountType = AccountType.PAYROLL;
+                    break;
+                case 4:
+                    accountType = AccountType.PAYMENT;
+                    break;
+                case 5:
+                    accountType = AccountType.CORPORATE;
+                    break;
+                default:
+                    System.out.println("Invalid type!");
+                    return;
+            }
+
+            Client client = clientMenu(scanner);
+            client = clientDAO.saveOrUpdate(client);
+            Account account = new Account(accountNumber, accountType, client);
+
+            if (accountDAO.hasSameTypeAccount(client, accountType)) {
+                System.out.println("An account already exists with the same type for the informed CPF!");
                 return;
+            }
+
+            accountDAO.save(account);
+
+            System.out.println("Account registered successfully!");
+            System.out.println("Account number: " + account.getNumber());
+        } else {
+            System.out.println("Invalid input! Please enter a number.");
+            scanner.nextLine();
+            openAccount(scanner);
         }
-
-        Client client = clientMenu(scanner);
-        client = clientDAO.saveOrUpdate(client);
-        Account account = new Account(accountNumber, accountType, client);
-
-        if (accountDAO.hasSameTypeAccount(client, accountType)) {
-            System.out.println("An account already exists with the same type for the informed CPF!");
-            return;
-        }
-
-        accountDAO.save(account);
-
-        System.out.println("Account registered successfully!");
-        System.out.println("Account number: " + account.getNumber());
     }
 
     public static Account findAccount(String accountNumber) {
@@ -72,7 +78,9 @@ public class AccountService {
 
     public static void deposit(Scanner scanner, Account account) {
         System.out.print("Inform a value to deposit: ");
-        BigDecimal value = scanner.nextBigDecimal();
+        BigDecimal value = scanner.hasNextBigDecimal()
+                ? scanner.nextBigDecimal()
+                : new BigDecimal(0);
 
         if (value.compareTo(BigDecimal.ZERO) <= 0) {
             System.out.println("Invalid value!");
@@ -85,9 +93,12 @@ public class AccountService {
 
     public static void withdraw(Scanner scanner, Account account) {
         System.out.print("Inform a value to withdraw: ");
-        BigDecimal value = scanner.nextBigDecimal();
+        BigDecimal value = scanner.hasNextBigDecimal()
+                ? scanner.nextBigDecimal()
+                : new BigDecimal(0);
 
-        if (accountDAO.withdraw(account, value)) {
+        if (value.compareTo(BigDecimal.ZERO) <= 0) return;
+        if (accountDAO.withdraw(account, value.abs())) {
             System.out.println("Withdraw successful!");
         }
     }
@@ -102,8 +113,15 @@ public class AccountService {
             return;
         }
 
+        if (destination.getNumber().equals(origin.getNumber())) {
+            System.out.println("You can't transfer the same account!");
+            return;
+        }
+
         System.out.print("Inform a value to transfer: ");
-        BigDecimal value = scanner.nextBigDecimal();
+        BigDecimal value = scanner.hasNextBigDecimal()
+                ? scanner.nextBigDecimal()
+                : new BigDecimal(0);
 
         if (value.compareTo(BigDecimal.ZERO) <= 0) {
             System.out.println("Invalid value!");

@@ -20,23 +20,29 @@ public class MenuHandler {
             System.out.println("==================================");
             System.out.print("Choose an option: ");
 
-            int option = scanner.nextInt();
+            if (scanner.hasNextInt()) {
+                int option = scanner.nextInt();
 
-            switch (option) {
-                case 1:
-                    loginMenu(scanner);
-                    break;
-                case 2:
-                    AccountService.openAccount(scanner);
-                    break;
-                case 0:
-                    running = false;
-                    break;
-                default:
-                    System.out.println("Invalid option! Please try again!");
+                switch (option) {
+                    case 1:
+                        loginMenu(scanner);
+                        break;
+                    case 2:
+                        AccountService.openAccount(scanner);
+                        break;
+                    case 0:
+                        running = false;
+                        break;
+                    default:
+                        System.out.println("Invalid option! Please try again!");
+                }
+            } else {
+                System.out.println("Invalid input! Please enter a number.");
+                scanner.nextLine();
             }
         }
     }
+
 
     public static void loginMenu(Scanner scanner) {
         boolean running = true;
@@ -49,30 +55,35 @@ public class MenuHandler {
             System.out.println("==================================");
             System.out.print("Choose an option: ");
 
-            int option = scanner.nextInt();
+            if (scanner.hasNextInt()) {
+                int option = scanner.nextInt();
 
-            switch (option) {
-                case 1:
-                    System.out.print("Inform an account number: ");
-                    String accountNumber = scanner.next();
-                    Account account = AccountService.findAccount(accountNumber);
+                switch (option) {
+                    case 1:
+                        System.out.print("Inform an account number: ");
+                        String accountNumber = scanner.next();
+                        Account account = AccountService.findAccount(accountNumber);
 
-                    if (account == null) {
-                        System.out.println("Account not found!");
-                    } else {
-                        bankMenu(scanner, account);
+                        if (account == null) {
+                            System.out.println("Account not found!");
+                        } else {
+                            bankMenu(scanner, account);
+                            running = false;
+                        }
+                        break;
+                    case 2:
+                        AccountService.openAccount(scanner);
                         running = false;
-                    }
-                    break;
-                case 2:
-                    AccountService.openAccount(scanner);
-                    running = false;
-                    break;
-                case 0:
-                    running = false;
-                    break;
-                default:
-                    System.out.println("Invalid option! Please try again!");
+                        break;
+                    case 0:
+                        running = false;
+                        break;
+                    default:
+                        System.out.println("Invalid option! Please try again!");
+                }
+            } else {
+                System.out.println("Invalid input! Please enter a number.");
+                scanner.nextLine();
             }
         }
     }
@@ -91,29 +102,34 @@ public class MenuHandler {
             System.out.println("=============================");
             System.out.print("Choose an option: ");
 
-            int option = scanner.nextInt();
+            if (scanner.hasNextInt()) {
+                int option = scanner.nextInt();
 
-            switch (option) {
-                case 1:
-                    AccountService.deposit(scanner, account);
-                    break;
-                case 2:
-                    AccountService.withdraw(scanner, account);
-                    break;
-                case 3:
-                    System.out.println("Current balance: " + account.getBalance());
-                    break;
-                case 4:
-                    AccountService.transfer(scanner, account);
-                    break;
-                case 5:
-                    AccountService.printBankStatement(account);
-                    break;
-                case 0:
-                    running = false;
-                    break;
-                default:
-                    System.out.println("Invalid option! Please try again!");
+                switch (option) {
+                    case 1:
+                        AccountService.deposit(scanner, account);
+                        break;
+                    case 2:
+                        AccountService.withdraw(scanner, account);
+                        break;
+                    case 3:
+                        System.out.println("Current balance: " + account.getBalance());
+                        break;
+                    case 4:
+                        AccountService.transfer(scanner, account);
+                        break;
+                    case 5:
+                        AccountService.printBankStatement(account);
+                        break;
+                    case 0:
+                        running = false;
+                        break;
+                    default:
+                        System.out.println("Invalid option! Please try again!");
+                }
+            } else {
+                System.out.println("Invalid input! Please enter a number.");
+                scanner.nextLine();
             }
         }
     }
