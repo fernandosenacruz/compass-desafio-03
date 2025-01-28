@@ -9,6 +9,7 @@ import br.com.compass.util.AccountNumberGeneratorUtil;
 import br.com.compass.util.DateTimeFormatterUtil;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Scanner;
 
 import static br.com.compass.handler.MenuHandler.clientMenu;
@@ -114,8 +115,20 @@ public class AccountService {
         }
 
         if (destination.getNumber().equals(origin.getNumber())) {
-            System.out.println("You can't transfer the same account!");
+            System.out.println("You can't transfer to the same account!");
             return;
+        }
+
+        if (origin.getType() == AccountType.SAVING || origin.getType() == AccountType.PAYROLL) {
+            List<Account> accountList = accountDAO.accountsByClient(origin.getClient().getCpf());
+
+            boolean mayTransfer = accountList.stream()
+                    .anyMatch(account -> account.getNumber().equals(destination.getNumber()));
+
+            if (!mayTransfer) {
+                System.out.println("You can only transfer to another account of the same CPF!");
+                return;
+            }
         }
 
         System.out.print("Inform a value to transfer: ");

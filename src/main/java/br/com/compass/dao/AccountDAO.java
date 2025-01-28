@@ -136,4 +136,13 @@ public class AccountDAO {
                     .list();
         }
     }
+
+    public List<Account> accountsByClient(String cpf) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                            "from Account a where a.client.cpf = :cpf", Account.class)
+                    .setParameter("cpf", cpf)
+                    .list();
+        }
+    }
 }

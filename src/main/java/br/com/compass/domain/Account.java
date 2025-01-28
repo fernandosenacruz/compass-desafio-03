@@ -28,7 +28,7 @@ public class Account {
     @Column(nullable = false, name = "register_date")
     private LocalDateTime registerDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
@@ -49,6 +49,14 @@ public class Account {
 
     public String getNumber() {
         return number;
+    }
+
+    public AccountType getType() {
+        return type;
+    }
+
+    public Client getClient() {
+        return client;
     }
 
     public BigDecimal getBalance() {
